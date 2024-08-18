@@ -48,6 +48,7 @@ if __name__ == "__main__":
     certified, tag_name = download("latest", dry_run=False)
     # create a temp directory to hold the extracted binaries
     check_platforms(certified)
+    dist_dir.mkdir(exist_ok=True)
     for tar_gz in certified:
         llvm_triple = get_llvm_triple(tar_gz)
         platform = LLVM_TRIPLES_TO_PYTHON_WHEEL_PLATFORMS.get(llvm_triple)

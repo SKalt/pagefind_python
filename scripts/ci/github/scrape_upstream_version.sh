@@ -2,6 +2,7 @@
 # fetch the current version of the pagefind executable
 # see https://simonwillison.net/2020/Oct/9/git-scraping/
 set -eu
+export PATH="$PWD/.venv/bin:$PATH"
 file="pagefind_version.txt"
 
 python3 -m scripts.build.get_pagefind_release
