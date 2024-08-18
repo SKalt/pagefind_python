@@ -16,7 +16,9 @@ jobs:
           - "3.11" # until 2027-10-31
           - "3.10" # until 2026-10-31
           - "3.9"  # until 2025-10-31
-          - "3.8"  # until 2024-10-31
+          # 3.8 is already dropped by some distant transitive dependencies
+          # (i.e. docutils), so it's easier to drop it here too.
+          # - "3.8"  # until 2024-10-31
         
     steps:
       - name: Checkout
