@@ -11,4 +11,6 @@ vendor_dir = repo_root / "vendor"
 
 
 def setup_logging() -> None:
-    logging.basicConfig(level=os.environ.get("LOG_LEVEL") or logging.INFO)
+    logging.basicConfig(
+        level=os.environ.get("PAGEFIND_PYTHON_LOG_LEVEL") or logging.INFO
+    )

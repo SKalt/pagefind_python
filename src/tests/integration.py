@@ -5,7 +5,7 @@ import os
 
 from pagefind_python.index import IndexConfig, PagefindIndex
 
-logging.basicConfig(level=os.environ.get("LOG_LEVEL", "INFO"))
+logging.basicConfig(level=os.environ.get("PAGEFIND_PYTHON_LOG_LEVEL", "INFO"))
 log = logging.getLogger(__name__)
 html_content = (
     "<html>"

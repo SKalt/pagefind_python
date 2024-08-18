@@ -6,7 +6,7 @@ import os
 import shutil
 from contextlib import AbstractAsyncContextManager
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Dict, Optional, cast
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, cast
 
 from .types import (
     InternalNewIndexRequest,
@@ -17,6 +17,7 @@ from .types import (
     InternalResponseType,
     InternalServiceRequest,
     InternalServiceResponse,
+    InternalSyntheticFile,
 )
 
 if TYPE_CHECKING:
@@ -25,7 +26,10 @@ if TYPE_CHECKING:
 log = logging.getLogger(__name__)
 
 
-def _must_find_binary() -> Path:
+__all__ = ["PagefindService", "get_executable"]
+
+
+def get_executable() -> Optional[Path]:
     try:
         from pagefind_bin_extended import get_executable  # type: ignore
 
@@ -47,9 +51,17 @@ def _must_find_binary() -> Path:
     external: Optional[str] = shutil.which("pagefind_extended")
     external = external or shutil.which("pagefind")
     if external is None:
-        raise FileNotFoundError("Could not find pagefind binary")
+        log.debug("Could not find externally-installed pagefind binary")
+        return None
     else:
+        log.debug(f"using {external}")
         return Path(external)
+
+
+def _must_get_executable() -> Path:
+    if (bin := get_executable()) is None:
+        raise FileNotFoundError("Could not find pagefind binary")
+    return bin
 
 
 def _encode(req: InternalServiceRequest) -> bytes:
@@ -67,7 +79,7 @@ class PagefindService(AbstractAsyncContextManager["PagefindService"]):
     # _messages
     def __init__(self) -> None:
         self._loop = asyncio.get_event_loop()
-        self._bin = _must_find_binary()
+        self._bin = _must_get_executable()
         self._responses = dict()
 
     async def launch(self) -> "PagefindService":
@@ -79,7 +91,7 @@ class PagefindService(AbstractAsyncContextManager["PagefindService"]):
         self._backend = await asyncio.create_subprocess_exec(
             self._bin,
             "--service",
-            "--verbose",
+            # "--verbose", # <- verbose emits debug logs to stdout, which is also used for IPC
             cwd=os.getcwd(),
             stdin=asyncio.subprocess.PIPE,
             stdout=asyncio.subprocess.PIPE,
@@ -116,7 +128,13 @@ class PagefindService(AbstractAsyncContextManager["PagefindService"]):
         await self._backend.stdin.drain()
         log.debug(f"request sent: {req}")
         result = await future
-        log.debug(f"received response: {result}")
+        if result["type"] == InternalResponseType.GET_FILES.value:  # these are HUGE
+            if (files := result.get("files")) is not None:
+                files = cast(List[InternalSyntheticFile], files)
+                base64_ch = sum(len(file["content"]) for file in files)
+                log.debug(f"received response: <{len(files)} files, {base64_ch} chars>")
+        else:
+            log.debug(f"received response: {result}")
         return result
 
     async def _wait_for_responses(self) -> None:
@@ -128,7 +146,7 @@ class PagefindService(AbstractAsyncContextManager["PagefindService"]):
             assert self._backend.stdout is not None
             log.debug("checking for data")
             output = await self._backend.stdout.readuntil(b",")
-            if len(output) <= 100:
+            if len(output) <= 200:
                 log.debug(f"received data: {output!r}")
             else:
                 log.debug(

@@ -10,7 +10,7 @@ from . import vendor_dir, upstream_version_file
 from .download_verification import verify_hashes
 
 log = logging.getLogger(__name__)
-logging.basicConfig(level=os.environ.get("LOG_LEVEL") or logging.INFO)
+logging.basicConfig(level=os.environ.get("PAGEFIND_PYTHON_LOG_LEVEL") or logging.INFO)
 
 if sys.argv[1:]:
     version = sys.argv[1]
