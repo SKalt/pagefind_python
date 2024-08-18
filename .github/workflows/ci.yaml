@@ -1,0 +1,59 @@
+# a minimal example of a GitHub Actions workflow that deploys a package to pypi
+name: Continuous integration
+on:
+  workflow_dispatch:
+  push:
+
+jobs:
+  python_ci:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version:
+          # Test on python versions with current security support.
+          # See https://endoflife.date/python
+          - "3.12" # until 2028-10-31
+          - "3.11" # until 2027-10-31
+          - "3.10" # until 2026-10-31
+          - "3.9"  # until 2025-10-31
+          - "3.8"  # until 2024-10-31
+        
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: shellcheck
+        uses: ludeeus/action-shellcheck@master
+      - name: Set up python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Set up poetry
+        run: bash ./scripts/ci/github/setup_poetry.sh
+      - name: cache venv
+        uses: actions/cache@v4
+        with:
+          path: .venv
+          key: ${{ runner.os }}-poetry-${{ matrix.python-version }}-${{ hashFiles('**/poetry.lock') }}
+      - name: Install dev dependencies
+        run: bash ./scripts/ci/github/install_dependencies.sh
+      - name: Python lints
+        run: bash ./scripts/ci/python_lints.sh
+        # TODO: figure out how to cache the .mypy_cache
+      - name: check cog
+        run: bash ./scripts/ci/cog/check.sh
+      - name: package binaries
+        run: python3 -m scripts.build.all # should take ~30s
+      - name: integration tests
+        run: bash ./scripts/ci/github/integration_tests.sh
+      # - | # fetch the current version of the pagefind executable
+      #   python3 -m scripts.build.get_pagefind_release
+      #   pagefind_version=$(cat ./pagefind_version.txt)
+      #   if git --no-pager diff --exit-code; then
+      #     exit 0
+      #   else
+      #     git add pagefind_version.txt
+      #     git commit -m "core: update pagefind to $pagefind_version"
+      #     # TODO: continue the workflow
+      #   fi
+
+      
