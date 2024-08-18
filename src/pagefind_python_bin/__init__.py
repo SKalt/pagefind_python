@@ -15,7 +15,7 @@ log = logging.getLogger(__name__)
 def get_candidate_paths() -> List[Path]:
     names = ["pagefind_extended", "pagefind"]
     extensions = [""]
-    if platform.system().lower() == "Windows":
+    if platform.system().lower() == "windows":
         extensions.append(".exe")
     bin_names = [n + ext for n in names for ext in extensions]
     paths = [this_dir / bin for bin in bin_names]
