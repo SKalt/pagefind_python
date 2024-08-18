@@ -35,7 +35,7 @@ jobs:
           path: .venv
           key: ${{ runner.os }}-poetry-${{ matrix.python-version }}-${{ hashFiles('**/poetry.lock') }}
       - name: Install dev dependencies
-        run: bash ./scripts/ci/github/install_dependencies.sh
+        run: bash ./scripts/ci/github/install_dev_dependencies.sh
       - name: Python lints
         run: bash ./scripts/ci/python_lints.sh
         # TODO: figure out how to cache the .mypy_cache
