@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-# assume the python version is >= 3.8, which is the oldest LTS version as of
-# the time of writing, 2024-06-29
+# assume the python version is >= 3.9, which is the oldest LTS version with
+# more 2 months of life as of the time of writing, 2024-08-18
 
 
 # https://docs.python.org/3/reference/datamodel.html#async-context-managers

@@ -1,13 +1,15 @@
 #!/usr/bin/env bash
 set -eu
+# ensure pagefind is not installed
+if command -v pagefind; then
+  exit 1
+fi
+# ensure pagefind_python is not installed in the current python environment
+if python3 -c "import pagefind"; then
+  exit 1
+fi
 
 # use pagefind installed from the officially-maintained node.js channel
-
-# use the global python3 environment to test the python package -- ok since it
-# gets deleted after each job run
-export PATH="${PATH/$VIRTUAL_ENV\/bin:/}"
-unset VIRTUAL_ENV
-
 pagefind_version="$(cat ./pagefind_version.txt)"
 npm i "pagefind@$pagefind_version"
 _prev_path="$PATH"
@@ -22,14 +24,22 @@ export PATH="$PWD/node_modules/.bin:$PATH"
 # src = repo_root / 'src'
 # sys.path.remove(str(src))
 # "
-python3 -m pip install --no-index --find-links=file://dist pagefind_python
+python3 -m pip install         \
+  --no-index --find-links=dist \
+  --only-binary :all:          \
+  pagefind_python
 python3 src/tests/integration.py
 
+# remove the externally installed pagefind binary
 rm -rf node_modules output
 export PATH="$_prev_path"
 if command -v pagefind; then
   exit 1
 fi
-python3 -m pip install --only-binary :all: --find-links=file://dist pagefind_bin
+python3 -m pip install         \
+  --no-index --find-links=dist \
+  --only-binary :all:          \
+  'pagefind_bin'
+
 python3 src/tests/integration.py
 

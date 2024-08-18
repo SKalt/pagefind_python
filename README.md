@@ -4,8 +4,8 @@ An async python API for the [pagefind](https://pagefind.app) binary.
 ## Installation
 
 ```sh
-python3 -m pip install 'pagefind[bin]'
-python3 -m pagefind --help
+python3 -m pip install 'pagefind_python[bin]'
+python3 -m pagefind_python --help
 ```
 
 ## Usage

@@ -174,6 +174,7 @@ def write_pagefind_bin_only_wheel(
         name += "_extended"
     contents: Mapping[Union[str, ZipInfo], Path] = {
         f"{name}/__init__.py": (src_dir / "__init__.py"),
+        f"{name}/__main__.py": (src_dir / "__main__.py"),
         f"{name}/{executable.name}": executable,
     }
 

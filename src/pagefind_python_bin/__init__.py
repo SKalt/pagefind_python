@@ -45,7 +45,3 @@ def cli() -> None:
         import subprocess
 
         sys.exit(subprocess.call(argv))
-
-
-if __name__ == "__main__":
-    cli()

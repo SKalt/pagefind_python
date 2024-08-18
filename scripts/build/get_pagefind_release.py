@@ -79,6 +79,8 @@ def download(
 
 if __name__ == "__main__":
     _urls, _files, tag_name = get_version_downloads("latest")
+    version = tag_name.removeprefix("v")
     with upstream_version_file.open("w") as f:
-        f.write(tag_name.removeprefix("v") + "\n")
+        f.write(version + "\n")
         # to avoid IDEs adding a trailing newline and causing a diff, we add one here.
+    print(version)
