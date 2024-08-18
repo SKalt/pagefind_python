@@ -40,7 +40,7 @@ def prefix(pre: str, s: str) -> str:
     return pre + s.replace("\n", f"\n{pre}")
 
 
-async def main():
+async def main() -> None:
     config = IndexConfig(
         root_selector="main", logfile="index.log", output_path="./output", verbose=True
     )

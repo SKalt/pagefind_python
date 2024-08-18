@@ -3,7 +3,7 @@ import logging
 import os
 import sys
 from pathlib import Path
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Tuple, Union
 from urllib.request import urlopen
 
 from . import vendor_dir, upstream_version_file
@@ -52,7 +52,7 @@ def get_version_downloads(
 
 
 def download(
-    version: str | None = None, dry_run: bool = True
+    version: Union[str, None] = None, dry_run: bool = True
 ) -> Tuple[List[Path], str]:
     urls, files, tag_name = get_version_downloads(version or "latest")
     target_dir = vendor_dir / tag_name
