@@ -803,4 +803,4 @@ extended = []
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9"
-content-hash = "f3fb85e639cde887e3bc127c40f0a89d84533f22ca93c94f753a12bb65c3ecf7"
+content-hash = "e092308a951e575c41d91b84aed8b90a20449e970bdb27a30502be4aa2a1b7fc"
