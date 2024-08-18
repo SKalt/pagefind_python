@@ -20,9 +20,6 @@ else:
     version = "latest"
 
 
-assert vendor_dir.is_dir(), f"{vendor_dir} is not a directory"
-
-
 def get_version_downloads(
     version: str,
 ) -> tuple[
@@ -61,7 +58,7 @@ def download(
         for url in urls:
             log.info(f"  - {url}")
         return [], tag_name
-    target_dir.mkdir(exist_ok=True)
+    target_dir.mkdir(parents=True, exist_ok=True)
     log.info(f"downloading {len(urls)} assets to {target_dir}")
     for i, url in enumerate(urls):
         name = url.split("/")[-1]
